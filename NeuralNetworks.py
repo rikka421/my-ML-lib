@@ -40,21 +40,22 @@ class Layer():
         # print(d_weight.shape)
         d_bias = np.sum(output2linear, axis=0)
         self.weights = self.weights - d_weight * 0.01
-
         self.bias = self.bias - d_bias * 0.01
+
+        return d_weight, d_bias
 
 
 if __name__ == '__main__':
     np.random.seed(42)
-    layer1 = Layer(3, 2)
+    layer1 = Layer(3, 3)
     # print(layer1.weights)
     # print(layer1.bias)
 
     inputs = np.random.rand(10, 3)
-    y = np.random.rand(10, 2)
+    y = inputs * 2
     for i in range(10000):
-        output = layer1.forward(inputs)
-        layer1.backward(output - y)
-        print(np.sum(np.square(output - y) / 2))
+        l1 = layer1.forward(inputs)
+        layer1.backward(l1 - y)
+        print(np.sum(np.square(l1 - y) / 2))
 
 
