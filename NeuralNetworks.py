@@ -6,11 +6,8 @@ class Layer():
         self.output_size = output_size
 
         # weights: input * output
-        # self.weights = np.ones((input_size, output_size))
-        # self.bias = -10 * np.ones((1, output_size))
         self.weights = np.random.rand(input_size, output_size)
-        self.bias = np.ones((1, output_size))
-        # print(self.weights, self.bias)
+        self.bias = np.random.rand(1, output_size)
 
         self.activation_function = activation_function
 
@@ -72,7 +69,7 @@ class NeuralNetwork:
         self.Y = X
         return X
 
-    def backward(self, X, Y, lr):
+    def backward(self, Y, lr):
         pre_d_values = self.Y - Y
         for layer in self.layers[::-1]:
             pre_d_values = layer.backward(pre_d_values, lr)
@@ -80,7 +77,7 @@ class NeuralNetwork:
     def train(self, X, Y, epoch=1000, lr=0.01):
         for i in range(epoch):
             self.forward(X)
-            self.backward(X, Y, lr)
+            self.backward(Y, lr)
             print(np.sum(np.square(Y - self.Y)))
 
     def predict(self, X):
@@ -89,46 +86,19 @@ class NeuralNetwork:
             # print(X)
         return self.forward(X)
 
-def test1():
-    np.random.seed(42)
-    layer1 = Layer(3, 3)
-    # print(layer1.weights)
-    # print(layer1.bias)
-
-    inputs = np.random.rand(10, 3)
-    y = inputs * 2
-    for i in range(10000):
-        l1 = layer1.forward(inputs)
-        layer1.backward(l1 - y, 0.01)
-        print(np.sum(np.square(l1 - y)))
-
-def test2():
-    d = 2
-    n = 100
-
-    X = np.random.rand(100, d)
-    Y = X * X
-
-    layers = [
-        # Layer(d, d),
-        Layer(d, n),
-        # Layer(n, n),
-        Layer(n, d, activation_function=lambda x: x),
-        # Layer(n, d, activation_function=lambda x: x)
-    ]
-
-    nn = NeuralNetwork(layers[0].input_size, layers[-1].output_size, layers)
-
-    # print(nn.forward(X))
-
-    nn.train(X, Y, 500, 1e-4)
-    nn.predict(X)
 
 def test():
-    test2()
+    pass
 
 if __name__ == '__main__':
     np.random.seed(42)
 
-    test()
+    from torchvision import datasets
+    train_dataset = datasets.MNIST(root='./data', train=True, download=True)
+    test_dataset = datasets.MNIST(root='./data', train=False)
+    img_train = train_dataset.data
+    label_train = train_dataset.targets
+    img_test = test_dataset.data
+    label_test = test_dataset.targets
 
+    my_nn = NeuralNetwork(img_train.shape[1], label_train.shape[1])
