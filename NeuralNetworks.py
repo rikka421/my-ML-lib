@@ -78,7 +78,7 @@ class NeuralNetwork:
         for i in range(epoch):
             self.forward(X)
             self.backward(Y, lr)
-            print(np.sum(np.square(Y - self.Y)))
+            # print(np.sum(np.square(Y - self.Y)))
 
     def predict(self, X):
         for layer in self.layers:

@@ -45,8 +45,15 @@ train_loader = DataLoader(dataset=train_dataset, batch_size=64, shuffle=True)
 test_loader = DataLoader(dataset=test_dataset, batch_size=64, shuffle=False)
 
 def my_CrossEntropyLoss(logits, targets):
-    exp_sum = np.sum(np.exp(logits))
-    pass
+    sum_ans = 0
+    for logit, target in zip(logits, targets):
+        # 对于[10], int. 先计算sum(exp(p_i)), 再计算 exp(tar) / sum
+        exp_sum = np.sum(np.exp(logit))
+        target_val = np.exp(logit[target])
+        soft_max_val = target_val / exp_sum
+        sum_ans += np.log(soft_max_val)
+    sum_ans /= len(targets)
+    return -sum_ans
 
 def my_train(model, train_loader, num_epochs=5):
     for epoch in range(num_epochs):
@@ -60,8 +67,9 @@ def my_train(model, train_loader, num_epochs=5):
                 Y.append(array_label)
             Y = np.array(Y)
             # print(X.shape, Y.shape)
-            model.train(X, Y)
-            loss = np.sum(np.square(model.Y - Y))
+            model.train(X, Y, epoch=1)
+            tar_labels = np.array(labels)
+            loss = my_CrossEntropyLoss(model.forward(X), tar_labels)
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss:.4f}')
 
 model = MyNN()
