@@ -7,9 +7,10 @@ class Layer():
 
         # weights: input * output
         # self.weights = np.ones((input_size, output_size))
-        # self.bias = np.ones((1, output_size))
-        self.weights = np.random.rand(input_size, output_size) * 2 - 1
-        self.bias = np.random.rand(1, output_size) * 2 - 1
+        # self.bias = -10 * np.ones((1, output_size))
+        self.weights = np.random.rand(input_size, output_size)
+        self.bias = np.ones((1, output_size))
+        # print(self.weights, self.bias)
 
         self.activation_function = activation_function
 
@@ -44,8 +45,8 @@ class Layer():
         # d_input =  (m * output) * (output * input)= m * input
         d_input = output2linear @ self.weights.T
 
-        print(output2linear.shape, d_weight.shape, d_bias.shape)
-        print(d_input.shape)
+        # print(output2linear.shape, d_weight.shape, d_bias.shape)
+        # print(d_input.shape)
 
         # print(d_weight, d_bias)
 
@@ -80,32 +81,54 @@ class NeuralNetwork:
         for i in range(epoch):
             self.forward(X)
             self.backward(X, Y, lr)
-        print(np.sum(np.square(Y - self.Y)))
+            print(np.sum(np.square(Y - self.Y)))
 
     def predict(self, X):
+        for layer in self.layers:
+            X = layer.forward(X)
+            # print(X)
         return self.forward(X)
 
-if __name__ == '__main__':
+def test1():
     np.random.seed(42)
+    layer1 = Layer(3, 3)
+    # print(layer1.weights)
+    # print(layer1.bias)
 
-    d = 3
-    n = 10
+    inputs = np.random.rand(10, 3)
+    y = inputs * 2
+    for i in range(10000):
+        l1 = layer1.forward(inputs)
+        layer1.backward(l1 - y, 0.01)
+        print(np.sum(np.square(l1 - y)))
 
-    X = np.random.rand(20, d)
-    Y = 2 * X
+def test2():
+    d = 2
+    n = 100
+
+    X = np.random.rand(100, d)
+    Y = X * X
 
     layers = [
-        Layer(d, d),
-        # Layer(3, 3),
-        # Layer(10, 1),
-        # Layer(3, 1, activation_function=lambda x: x)
+        # Layer(d, d),
+        Layer(d, n),
+        # Layer(n, n),
+        Layer(n, d, activation_function=lambda x: x),
+        # Layer(n, d, activation_function=lambda x: x)
     ]
 
     nn = NeuralNetwork(layers[0].input_size, layers[-1].output_size, layers)
 
     # print(nn.forward(X))
 
-    nn.train(X, Y)
-    # nn.predict(X)
+    nn.train(X, Y, 500, 1e-4)
+    nn.predict(X)
 
+def test():
+    test2()
+
+if __name__ == '__main__':
+    np.random.seed(42)
+
+    test()
 
