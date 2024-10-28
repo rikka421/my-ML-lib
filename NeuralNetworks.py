@@ -62,6 +62,7 @@ class Layer():
 
         self.weights = self.weights - d_weight * lr
         self.bias = self.bias - d_bias * lr
+        # print("mean", np.sum(d_weight) / d_weight.size,  np.sum(d_bias) / d_bias.size)
 
         return d_input
 
