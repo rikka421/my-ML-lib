@@ -28,8 +28,13 @@ class Layer():
 
     def forward(self, inputs):
         self.inputs = inputs
+        print("self.inputs.shape", self.inputs.shape)
+        print("self.weights", self.weights.shape)
+        print("self.bias", self.bias.shape)
         self.linear_output = np.dot(inputs, self.weights) + self.bias
+        print("self.linear_output.shape", self.linear_output.shape)
         self.outputs = self.activation(self.linear_output)
+        print("self.outputs.shape", self.outputs.shape)
         return self.outputs
 
     def backward(self, pre_d_value, lr):
@@ -63,10 +68,11 @@ class NeuralNetwork:
         self.Y = None
 
     def forward(self, X):
+        print(X.shape)
         self.X = X
         for layer in self.layers:
             X = layer.forward(X)
-        self.Y = X
+            print(X.shape)
         return X
 
     def backward(self, Y, lr):

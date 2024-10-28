@@ -67,13 +67,30 @@ def my_train(model, train_loader, num_epochs=5):
                 Y.append(array_label)
             Y = np.array(Y)
             # print(X.shape, Y.shape)
-            model.train(X, Y, epoch=1)
+            model.train(X, Y, epoch=1, lr=0.001)
             tar_labels = np.array(labels)
             loss = my_CrossEntropyLoss(model.forward(X), tar_labels)
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss:.4f}')
 
 model = MyNN()
 my_train(model, train_loader)
+
+
+def evaluate(model, test_loader):
+    model.eval()  # 切换到评估模式
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for images, labels in test_loader:
+            # 前向传播
+            X = np.array([image.view(-1).numpy() for image in images])
+            Y = model(X)
+            _, predicted = np.max(Y, 1)
+            total += labels.size(0)
+            print(predicted, labels)
+            correct += (predicted == labels).sum()
+
+    print(f'Accuracy of the model on the test dataset: {100 * correct / total:.2f}%')
 
 # 训练函数
 def train(model, train_loader, criterion, optimizer, num_epochs=5):
