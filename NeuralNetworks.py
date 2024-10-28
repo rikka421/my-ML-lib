@@ -6,8 +6,10 @@ class Layer():
         self.output_size = output_size
 
         # weights: input * output
-        self.weights = np.random.rand(input_size, output_size) / input_size
-        self.bias = np.random.rand(1, output_size) + 1
+        # self.weights = np.random.rand(input_size, output_size) / input_size
+        # self.bias = np.random.rand(1, output_size)
+        self.weights = np.ones((input_size, output_size)) / input_size
+        self.bias = np.ones((1, output_size)) / input_size
 
         self.activation_function = activation_function
 
@@ -68,14 +70,11 @@ class NeuralNetwork:
     def __init__(self, input_size, output_size, layers):
         self.layers = layers
 
-        self.X = None
-        self.Y = None
-
     def forward(self, X):
         res = X
         for layer in self.layers:
-            # print("res", res)
             res = layer.forward(res)
+            # print("res", res)
             # print("weight, bias", layer.weights, layer.bias)
         # print("res", res)
         return res
@@ -88,7 +87,7 @@ class NeuralNetwork:
             # pre_d_values /= np.sum(pre_d_values)
             pre_d_values = layer.backward(pre_d_values, lr)
 
-    def train(self, X, Y, epoch=5000, lr=1e-3):
+    def train(self, X, Y, epoch=10000, lr=1e-3):
 
         for i in range(epoch):
             pre_Y = self.forward(X)
@@ -114,11 +113,11 @@ if __name__ == '__main__':
     np.random.seed(42)
 
     m = 1000
-    d = 5
+    d = 100
     inner = 128
 
     X = np.random.rand(m, d)
-    # X = np.ones((m, d), dtype=np.float32)
+    # X = np.array([[1, 2], [3, 4], [5, 6]])
     Y = 2 * X
 
     fc1 = Layer(d, inner)
