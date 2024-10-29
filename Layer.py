@@ -29,10 +29,10 @@ class FC_Layer(Layer):
     def __init__(self, input_size, output_size):
         super().__init__(input_size, output_size)
 
-        self.weight = np.ones((input_size, output_size)) * 3
-        self.bias = np.ones((1, output_size))
-        # self.weight = np.random.rand(input_size, output_size) / input_size
-        # self.bias = np.random.rand(1, output_size) / input_size
+        # self.weight = np.random.normal(loc=0, scale=0.01, size=(input_size, output_size))
+        # self.bias = np.zeros((1, output_size))
+        self.weight = np.random.rand(input_size, output_size) / input_size
+        self.bias = np.random.rand(1, output_size) / input_size
 
     def forward(self, input):
         self.input = input
@@ -51,6 +51,5 @@ class FC_Layer(Layer):
     def update_params(self, lr):
         self.weight -= self.grad_weight * lr
         self.bias -= self.grad_bias * lr
-        print(self.weight, self.bias, self.grad_weight, self.grad_bias)
 
 
