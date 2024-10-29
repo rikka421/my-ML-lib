@@ -68,7 +68,7 @@ class Layer():
 
 
 class NeuralNetwork:
-    def __init__(self, input_size, output_size, layers):
+    def __init__(self, layers):
         self.layers = layers
 
     def forward(self, X):
@@ -113,23 +113,25 @@ def test():
 if __name__ == '__main__':
     np.random.seed(42)
 
-    m = 1000
-    d = 100
+    m = 64
+    d = 28*28
+    out = 10
     inner = 128
 
     X = np.random.rand(m, d)
     # X = np.array([[1, 2], [3, 4], [5, 6]])
-    Y = 2 * X
+    Y = np.ones((m, out))
+    Y *= (np.sum(X) / np.size)
 
     fc1 = Layer(d, inner)
     inner_num = 1
     fcs = [Layer(inner, inner)] * inner_num
-    fc2 = Layer(inner, d, activation_function=lambda x: x)
-    fc_one = Layer(d, d, activation_function=lambda x: x)
+    fc2 = Layer(inner, out, activation_function=lambda x: x)
+    fc_one = Layer(d, out, activation_function=lambda x: x)
 
     # print([fc1] + [fc2])
 
     # model = NeuralNetwork
-    model = NeuralNetwork(d, d, [fc1]+fcs+[fc2])
+    model = NeuralNetwork([fc1]+fcs+[fc2])
 
     model.train(X, Y)
