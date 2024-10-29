@@ -33,17 +33,16 @@ class CrossEntropyLoss(MyCriterion):
         self.input = input
         self.label = label
 
-        outputs = np.logaddexp.reduce(self.input, axis=1) - np.logaddexp.reduce(self.input * self.label, axis=1)
-        outputs = np.sum(outputs) / label.size
+        outputs = (np.logaddexp.reduce(self.input, axis=1)
+                   - np.sum(self.input * self.label, axis=1))
         return outputs
 
     def backward(self):
         # return m * output
         # grad(log sum e^hat_y_i )
-        out_grad = np.exp(self.input) * np.logaddexp.reduce(self.input, axis=1).reshape(self.input.shape[0], 1)
+        out_grad = np.exp(self.input) / np.sum(np.exp(self.input), axis=1)
         # -= grad(log sum e^(hat_y_i * y_i) )
-        out_grad -= np.exp(self.input * self.label) * np.logaddexp.reduce(self.input * self.label, axis=1).reshape(self.input.shape[0], 1)
-        out_grad /= self.label.shape[1]
+        out_grad -= self.label
         return out_grad
 
 if __name__ == '__main__':
@@ -52,15 +51,5 @@ if __name__ == '__main__':
     Y = np.array([[0, 0, 1]])
     pre_Y = np.array([[1, 2, 3]])
 
-    a = np.sum(np.exp(pre_Y * Y))
-    b = np.sum(np.exp(pre_Y))
-    c = - np.log(a / b) / 3
-    print(a, b, c)
     print(criterion.forward(pre_Y, Y))
-
-    d = np.log(b) * np.exp(pre_Y) - np.log(a) * np.exp(pre_Y * Y)
-    e = d / 3
-
-    print(d, e)
-
     print(criterion.backward())

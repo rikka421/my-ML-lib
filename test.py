@@ -92,8 +92,8 @@ def test_Linear():
 
     model = SimpelModel(input_size, inner_sizes, output_size)
 
-    # criterion = CrossEntropyLoss()
-    criterion = SquareLoss()
+    criterion = CrossEntropyLoss()
+    # criterion = SquareLoss()
 
     epochs = 10
     for epoch_i in range(epochs):
