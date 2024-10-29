@@ -1,6 +1,6 @@
 import numpy as np
 
-class Layer():
+class MyLayer():
     def __init__(self, input_size, output_size):
         self.input_size = input_size
         self.output_size = output_size
@@ -16,7 +16,7 @@ class Layer():
         raise NotImplementedError
 
 
-class ReLu_Layer(Layer):
+class ReLu_Layer(MyLayer):
     def forward(self, input):
         self.input = input
         return np.where(input > 0, input, 0)
@@ -25,7 +25,7 @@ class ReLu_Layer(Layer):
         return np.where(self.input > 0, in_grad, 0)
 
 
-class FC_Layer(Layer):
+class FC_Layer(MyLayer):
     def __init__(self, input_size, output_size):
         super().__init__(input_size, output_size)
 

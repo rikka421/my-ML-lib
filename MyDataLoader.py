@@ -1,8 +1,9 @@
 import numpy as np
-from torch.utils.data import Dataset
+import torch
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
 
-
-class DataLoader:
+class MyDataLoader:
     def __init__(self, input_size, output_size, batch_num, batch_size):
         self.batch_num = batch_num
         self.batch_size = batch_size
@@ -32,7 +33,7 @@ class DataLoader:
             self.cur_batch += 1
             return value
 
-class LinearData(DataLoader):
+class LinearData(MyDataLoader):
     def __init__(self, input_size, output_size, batch_num, batch_size):
         super(LinearData, self).__init__(input_size, output_size, batch_num, batch_size)
 
@@ -45,7 +46,7 @@ class LinearData(DataLoader):
         self.inputs = X
         self.labels = Y
 
-class ReLuData(DataLoader):
+class ReLuData(MyDataLoader):
     def __init__(self, input_size, output_size, batch_num, batch_size):
         super(ReLuData, self).__init__(input_size, output_size, batch_num, batch_size)
 
@@ -60,7 +61,7 @@ class ReLuData(DataLoader):
         self.labels = Y
 
 
-class SquareData(DataLoader):
+class SquareData(MyDataLoader):
     def __init__(self, input_size, output_size, batch_num, batch_size):
         super(SquareData, self).__init__(input_size, output_size, batch_num, batch_size)
 
@@ -83,9 +84,53 @@ class SquareData(DataLoader):
         self.inputs = X
         self.labels = Y
 
+class MNISTData(MyDataLoader):
+    def __init__(self, train=True):
+        # 数据预处理
+        transform = transforms.Compose([
+            transforms.ToTensor(),  # 将图像转换为张量
+            # transforms.Normalize((0.5,), (0.5,))  # 归一化
+            transforms.Lambda(lambda x: x.view(-1)),  # 张量转换为一维
+        ])
+        target_transform = transforms.Compose([
+            transforms.Lambda(lambda y: torch.zeros(10, dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1)),  # onehot
+        ])
 
+        # 加载训练和测试数据集
+        # m * (torch.Size([1, 28, 28]), int), 每个样本为(X, y)元组, 其中X是图片, y是标签
+        if train:
+            dataset = datasets.MNIST(
+                root='./data',
+                train=True,
+                download=True,
+                transform=transform,
+                target_transform=target_transform
+                )
+        else:
+            dataset = datasets.MNIST(
+                root='./data',
+                train=False,
+                download=True,
+                transform=transform,
+                target_transform=target_transform
+                )
 
+        loader = DataLoader(dataset=dataset, batch_size=64, shuffle=True)
+        batch_num = len(loader)
 
+        inputs_list = []
+        labels_list = []
+
+        for inputs, labels in loader:
+            # 将输入和标签添加到列表中
+            inputs_list.append(inputs.numpy())  # 转换为 NumPy 数组
+            labels_list.append(labels.numpy())  # 转换为 NumPy 数组
+
+        super(MNISTData, self).__init__(28 * 28, 10, batch_num, 64)
+
+        # 将列表转换为 NumPy 数组
+        self.inputs = np.concatenate(inputs_list, axis=0)  # shape: (num_samples, 1, 28, 28)
+        self.labels = np.concatenate(labels_list, axis=0)
 
 
 

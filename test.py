@@ -1,14 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sspicon import SEC_E_NO_PA_DATA
 
-from DataLoader import *
-from DataLoader import LinearData
-from Layer import *
-from Criterion import *
-from NeuralNetworks import *
+from MyDataLoader import *
+from MyLayer import *
+from MyCriterion import *
+from MyNeuralNetworks import *
 
-class SimpelModel(NeuralNetwork):
+class SimpelModel(MyNeuralNetwork):
     def __init__(self, input_size, hidden_sizes, output_size):
         super(SimpelModel, self).__init__(input_size, hidden_sizes, output_size)
 
@@ -38,25 +36,26 @@ class SimpelModel(NeuralNetwork):
 if __name__ == '__main__':
     np.random.seed(42)
 
-    input_size = 1
-    inner_sizes = [4]
-    output_size = 1
-    batch_num = 1000
+    input_size = 28 * 28
+    inner_sizes = [128]
+    output_size = 10
+    """batch_num = 1000
     batch_size = 64
-    data_size = batch_size * batch_num
+    data_size = batch_size * batch_num"""
 
-    data_loader = SquareData(input_size, output_size, batch_num, batch_size)
+    data_loader = MNISTData()
     X, Y = data_loader.get_data_set()
 
     model = SimpelModel(input_size, inner_sizes, output_size)
     print(model.layers, model.update_layer_list)
 
-    criterion = SquareLoss()
+    # criterion = SquareLoss()
+    criterion = CrossEntropyLoss()
 
-    epochs = 5
+    epochs = 50
     for epoch_i in range(epochs):
         for batch_i, (input_data, label) in enumerate(data_loader):
-            # print(batch_i, input_data.shape, label.shape)
+            # print(batch_i)
             pre_label = model.forward(input_data)
             loss = criterion.forward(pre_label, label)
             in_grad = criterion.backward(loss)
@@ -64,10 +63,10 @@ if __name__ == '__main__':
             model.backward(in_grad)
             # print(np.max(in_grad))
             model.step()
-        print(epoch_i)
+        print(epoch_i, loss)
 
         pre_Y = model.forward(X)
 
-        plt.scatter(X, Y)
-        plt.scatter(X, pre_Y)
-        plt.show()
+        # plt.scatter(X, Y)
+        # plt.scatter(X, pre_Y)
+        # plt.show()
