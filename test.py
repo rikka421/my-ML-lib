@@ -33,7 +33,7 @@ class SimpelModel(MyNeuralNetwork):
             self.update_layer_list = [fc_in]
 
 
-if __name__ == '__main__':
+def test_MNIST():
     np.random.seed(42)
 
     input_size = 28 * 28
@@ -43,8 +43,9 @@ if __name__ == '__main__':
     batch_size = 64
     data_size = batch_size * batch_num"""
 
-    data_loader = MNISTData()
-    X, Y = data_loader.get_data_set()
+    data_loader = MNISTData(train=True)
+    test_data_loader = MNISTData(train=False)
+    X, Y = test_data_loader.get_data_set()
 
     model = SimpelModel(input_size, inner_sizes, output_size)
     print(model.layers, model.update_layer_list)
@@ -52,13 +53,15 @@ if __name__ == '__main__':
     # criterion = SquareLoss()
     criterion = CrossEntropyLoss()
 
-    epochs = 50
+    epochs = 10
     for epoch_i in range(epochs):
         for batch_i, (input_data, label) in enumerate(data_loader):
             # print(batch_i)
+            print(np.max(input_data), np.min(input_data))
             pre_label = model.forward(input_data)
+            print(np.exp(pre_label[0]) / np.sum(np.exp(pre_label[0])), label[0])
             loss = criterion.forward(pre_label, label)
-            in_grad = criterion.backward(loss)
+            in_grad = criterion.backward()
             # print(np.max(in_grad))
             model.backward(in_grad)
             # print(np.max(in_grad))
@@ -66,7 +69,49 @@ if __name__ == '__main__':
         print(epoch_i, loss)
 
         pre_Y = model.forward(X)
+        ans = np.argmax(pre_Y, axis=1)
+        labels = np.argmax(Y, axis=1)
+        print(np.sum(ans == labels) / labels.size, ans, labels)
 
         # plt.scatter(X, Y)
         # plt.scatter(X, pre_Y)
         # plt.show()
+
+def test_Linear():
+    np.random.seed(42)
+
+    input_size = 2
+    inner_sizes = [128]
+    output_size = 2
+    batch_num = 1000
+    batch_size = 64
+    data_size = batch_size * batch_num
+
+    data_loader = LinearData(input_size, output_size, batch_num, batch_size)
+    X, Y = data_loader.get_data_set()
+
+    model = SimpelModel(input_size, inner_sizes, output_size)
+
+    # criterion = CrossEntropyLoss()
+    criterion = SquareLoss()
+
+    epochs = 10
+    for epoch_i in range(epochs):
+        for batch_i, (input_data, label) in enumerate(data_loader):
+            pre_label = model.forward(input_data)
+            loss = criterion.forward(pre_label, label)
+            in_grad = criterion.backward()
+            model.backward(in_grad)
+            model.step()
+        print(epoch_i, loss)
+
+        pre_Y = model.forward(X)
+
+        plt.scatter(X, Y)
+        plt.scatter(X, pre_Y)
+        plt.show()
+
+
+
+if __name__ == '__main__':
+    test_Linear()

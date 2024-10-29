@@ -8,7 +8,7 @@ class MyCriterion():
     def forward(self, inputs, labels):
         raise NotImplementedError
 
-    def backward(self, in_grad):
+    def backward(self):
         raise NotImplementedError
 
 class SquareLoss(MyCriterion):
@@ -18,11 +18,11 @@ class SquareLoss(MyCriterion):
         self.label = label
         # print(self.input.shape, self.label.shape)
 
-        outputs = np.sum(np.square(input - label)) / (2 * label.size)
+        outputs = np.sum(np.square(input - label)) / (2 * label.shape[1])
         # print(np.max(input), np.max(label), np.max(outputs))
         return outputs
 
-    def backward(self, in_grad):
+    def backward(self):
         # return m * output
         return (self.input - self.label) / (self.label.shape[1])
 
@@ -33,17 +33,34 @@ class CrossEntropyLoss(MyCriterion):
         self.input = input
         self.label = label
 
-        exp_sum = np.sum(np.exp(input))
-        exp_pro = np.sum(np.exp(input * label))
-        outputs = np.log(exp_sum) - np.log(exp_pro)
-        outputs = -outputs / label.size
+        outputs = np.logaddexp.reduce(self.input, axis=1) - np.logaddexp.reduce(self.input * self.label, axis=1)
+        outputs = np.sum(outputs) / label.size
         return outputs
 
-    def backward(self, in_grad):
+    def backward(self):
         # return m * output
         # grad(log sum e^hat_y_i )
-        out_grad = np.exp(self.input) / np.sum(np.exp(self.input))
+        out_grad = np.exp(self.input) * np.logaddexp.reduce(self.input, axis=1).reshape(self.input.shape[0], 1)
         # -= grad(log sum e^(hat_y_i * y_i) )
-        out_grad -= np.exp(self.input * self.label) / np.sum(np.exp(self.input * self.label))
+        out_grad -= np.exp(self.input * self.label) * np.logaddexp.reduce(self.input * self.label, axis=1).reshape(self.input.shape[0], 1)
         out_grad /= self.label.shape[1]
         return out_grad
+
+if __name__ == '__main__':
+    criterion = CrossEntropyLoss()
+
+    Y = np.array([[0, 0, 1]])
+    pre_Y = np.array([[1, 2, 3]])
+
+    a = np.sum(np.exp(pre_Y * Y))
+    b = np.sum(np.exp(pre_Y))
+    c = - np.log(a / b) / 3
+    print(a, b, c)
+    print(criterion.forward(pre_Y, Y))
+
+    d = np.log(b) * np.exp(pre_Y) - np.log(a) * np.exp(pre_Y * Y)
+    e = d / 3
+
+    print(d, e)
+
+    print(criterion.backward())

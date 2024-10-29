@@ -41,7 +41,7 @@ class LinearData(MyDataLoader):
         X = np.random.rand(data_size, input_size)
         W = np.random.rand(input_size, output_size)
         b = np.random.rand(1, output_size)
-        Y = W * X - b
+        Y = X @ W - b
 
         self.inputs = X
         self.labels = Y
@@ -54,7 +54,7 @@ class ReLuData(MyDataLoader):
         X = np.random.rand(data_size, input_size) * 2
         W = np.ones((input_size, output_size)) / input_size
         b = np.ones((1, output_size))
-        Y = W * X - b
+        Y = X @ W - b
         Y = np.where(Y > 0, Y, 0)
 
         self.inputs = X
