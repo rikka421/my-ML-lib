@@ -43,23 +43,22 @@ def test_MNIST():
     batch_size = 64
     data_size = batch_size * batch_num"""
 
+    model = SimpelModel(input_size, inner_sizes, output_size)
+
     data_loader = MNISTData(train=True)
     test_data_loader = MNISTData(train=False)
     X, Y = test_data_loader.get_data_set()
 
-    model = SimpelModel(input_size, inner_sizes, output_size)
-    print(model.layers, model.update_layer_list)
 
-    # criterion = SquareLoss()
     criterion = CrossEntropyLoss()
 
     epochs = 10
     for epoch_i in range(epochs):
         for batch_i, (input_data, label) in enumerate(data_loader):
             # print(batch_i)
-            print(np.max(input_data), np.min(input_data))
+            # print(np.max(input_data), np.min(input_data))
             pre_label = model.forward(input_data)
-            print(np.exp(pre_label[0]) / np.sum(np.exp(pre_label[0])), label[0])
+            # print(np.exp(pre_label[0]) / np.sum(np.exp(pre_label[0])), label[0])
             loss = criterion.forward(pre_label, label)
             in_grad = criterion.backward()
             # print(np.max(in_grad))
@@ -71,29 +70,26 @@ def test_MNIST():
         pre_Y = model.forward(X)
         ans = np.argmax(pre_Y, axis=1)
         labels = np.argmax(Y, axis=1)
-        print(np.sum(ans == labels) / labels.size, ans, labels)
+        print(np.sum(ans == labels) / labels.size)
 
-        # plt.scatter(X, Y)
-        # plt.scatter(X, pre_Y)
-        # plt.show()
 
 def test_Linear():
     np.random.seed(42)
 
-    input_size = 2
+    input_size = 1
     inner_sizes = [128]
-    output_size = 2
+    output_size = 1
     batch_num = 1000
     batch_size = 64
     data_size = batch_size * batch_num
 
-    data_loader = LinearData(input_size, output_size, batch_num, batch_size)
-    X, Y = data_loader.get_data_set()
-
     model = SimpelModel(input_size, inner_sizes, output_size)
 
-    criterion = CrossEntropyLoss()
-    # criterion = SquareLoss()
+    data_loader = SquareData(input_size, output_size, batch_num, batch_size)
+    X, Y = data_loader.get_data_set()
+
+    # criterion = CrossEntropyLoss()
+    criterion = SquareLoss()
 
     epochs = 10
     for epoch_i in range(epochs):
@@ -114,4 +110,9 @@ def test_Linear():
 
 
 if __name__ == '__main__':
+    print("begin test SquareLoss and Square DataSet")
     test_Linear()
+    print("begin test CrossEntropyLoss and MNIST DataSet")
+    test_MNIST()
+    print("朝乾夕惕, 功不唐捐")
+    print("Congratulation!")

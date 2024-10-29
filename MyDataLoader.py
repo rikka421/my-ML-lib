@@ -133,4 +133,21 @@ class MNISTData(MyDataLoader):
         self.labels = np.concatenate(labels_list, axis=0)
 
 
+class CrossEntropyData(MyDataLoader):
+    def __init__(self, input_size, output_size, batch_num, batch_size):
+        super(CrossEntropyData, self).__init__(input_size, output_size, batch_num, batch_size)
+
+        data_size = batch_num * batch_size
+        X = np.random.rand(data_size, input_size)
+        W = np.random.rand(input_size, output_size)
+        b = np.random.rand(1, output_size)
+        Y = X @ W - b
+
+        Y = Y / np.sum(Y, axis=1).reshape(data_size, 1)
+
+        assert np.sum(Y) == data_size
+
+        self.inputs = X
+        self.labels = Y
+
 
