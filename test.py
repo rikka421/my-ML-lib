@@ -124,8 +124,8 @@ def test_function(function, inner_sizes=None):
 
     model = SimpelModel(input_size, inner_sizes, output_size)
     params = model.get_params()
-    # optimizer = Adam(params)
-    optimizer = SimpleSGD(params)
+    optimizer = Adam(params)
+    # optimizer = SimpleSGD(params)
     criterion = SquareLoss()
 
     data_loader = FunctionData(input_size, output_size, batch_num, batch_size, function)
@@ -168,8 +168,8 @@ def test_some_functions():
     func_lst = [
         # lambda x:x,
         # lambda x: (x * 2 - 1) ** 2,
-        lambda x: np.sin(x * 2 * np.pi) / 2 + 1 / 2,
-        # opi_func,
+        # lambda x: np.sin(x * 2 * np.pi) / 2 + 1 / 2,
+        opi_func,
     ]
 
     for func in func_lst:
