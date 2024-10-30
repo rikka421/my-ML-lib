@@ -3,9 +3,11 @@ import matplotlib.pyplot as plt
 import time
 
 from MyDataLoader import *
-from MyLayer import *
 from MyCriterion import *
+from MyOptimizer import *
+from MyLayer import *
 from MyNeuralNetworks import *
+
 
 class SimpelModel(MyNeuralNetwork):
     def __init__(self, input_size, hidden_sizes, output_size):
@@ -32,7 +34,6 @@ class SimpelModel(MyNeuralNetwork):
             fc_in = FC_Layer(input_size, output_size)
             self.layers = [fc_in]
             self.update_layer_list = [fc_in]
-
 
 def test_MNIST():
     print("begin test CrossEntropyLoss and MNIST DataSet")
@@ -72,42 +73,6 @@ def test_MNIST():
         print(np.sum(ans == labels) / labels.size)
     print("朝乾夕惕, 功不唐捐")
     print("Congratulation!")
-
-
-def test_Linear():
-    print("begin test SquareLoss and Square DataSet")
-    np.random.seed(42)
-
-    input_size = 1
-    inner_sizes = [128]
-    output_size = 1
-    batch_num = 1000
-    batch_size = 64
-    data_size = batch_size * batch_num
-
-    model = SimpelModel(input_size, inner_sizes, output_size)
-
-    data_loader = SquareData(input_size, output_size, batch_num, batch_size)
-    X, Y = data_loader.get_data_set()
-
-    # criterion = CrossEntropyLoss()
-    criterion = SquareLoss()
-
-    epochs = 10
-    for epoch_i in range(epochs):
-        for batch_i, (input_data, label) in enumerate(data_loader):
-            pre_label = model.forward(input_data)
-            loss = criterion.forward(pre_label, label)
-            in_grad = criterion.backward()
-            model.backward(in_grad)
-            model.step()
-        print(epoch_i, loss)
-
-        pre_Y = model.forward(X)
-
-        plt.scatter(X, Y)
-        plt.scatter(X, pre_Y)
-        plt.show()
 
 def test_CrossEntropyLoss():
     print("begin test CrossEntropyLoss and CrossEntropy DataSet")
@@ -158,23 +123,28 @@ def test_function(function, inner_sizes=None):
     data_size = batch_size * batch_num
 
     model = SimpelModel(input_size, inner_sizes, output_size)
+    params = model.get_params()
+    # optimizer = Adam(params)
+    optimizer = SimpleSGD(params)
+    criterion = SquareLoss()
 
     data_loader = FunctionData(input_size, output_size, batch_num, batch_size, function)
     X, Y = data_loader.get_data_set()
-    criterion = SquareLoss()
 
-    epochs = 100
+    epochs = 50
     for epoch_i in range(epochs):
         for batch_i, (input_data, label) in enumerate(data_loader):
             pre_label = model.forward(input_data)
             loss = criterion.forward(pre_label, label)
             in_grad = criterion.backward()
             model.backward(in_grad)
-            model.step(1e-2)
+            grads = model.get_grads()
+            # model.step(1e-3)
+            optimizer.step(grads)
         if epoch_i % 10 == 0:
             print(epoch_i, f"{loss:4f}")
-        if loss <= 1e-3:
-            print("loss <= 1e-3, break!")
+        if loss <= 1e-5:
+            print("loss <= 1e-5, break!")
             break
 
         pre_Y = model.forward(X)
@@ -194,36 +164,37 @@ def opi_func(x):
 
     return (res1 + (res2 + res3 + res4) / 40) / 2
 
-
-if __name__ == '__main__':
-    # test_Linear()
-    # test_MNIST()
-    # test_CrossEntropyLoss()
+def test_some_functions():
     func_lst = [
         # lambda x:x,
-        lambda x:(x * 2 - 1) ** 2,
-        lambda x:np.sin(x * 2 * np.pi) / 2 + 1 / 2,
-        opi_func,
+        # lambda x: (x * 2 - 1) ** 2,
+        lambda x: np.sin(x * 2 * np.pi) / 2 + 1 / 2,
+        # opi_func,
     ]
-
 
     for func in func_lst:
         for inner_sizes in [
-            [],
-            [4],
-            [16],
+            # [],
+            # [4],
+            # [16],
             # [64],
             [128],
             # [256],
             [512],
-            [1024],
-            [4, 4],
-            [16, 16],
+            # [1024],
+            # [4, 4],
+            # [16, 16],
             [64, 64],
             # [128, 128]
             [256, 256],
-            [512, 512]
-            ]:
+            # [512, 512]
+        ]:
             print("中间层数量:", inner_sizes)
             test_function(func, inner_sizes=inner_sizes)
             time.sleep(1)
+
+if __name__ == '__main__':
+    # test_MNIST()
+    # test_CrossEntropyLoss()
+    test_some_functions()
+

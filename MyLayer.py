@@ -12,9 +12,8 @@ class MyLayer():
     def backward(self, in_grad):
         raise NotImplementedError
 
-    def update_params(self, lr):
+    def get_params_grad(self):
         raise NotImplementedError
-
 
 class ReLu_Layer(MyLayer):
     def forward(self, input):
@@ -49,9 +48,8 @@ class FC_Layer(MyLayer):
         # d_input =  (m * output) * (output * input)= m * input
         return in_grad @ self.weight.T
 
-    def update_params(self, lr):
-        self.weight -= self.grad_weight * lr
-        self.bias -= self.grad_bias * lr
-        # print("grad", self.weight, self.grad_weight, self.bias, self.grad_bias)
+    def get_params(self):
+        return [self.weight, self.bias]
 
-
+    def get_grads(self):
+        return [self.grad_weight, self.grad_bias]
