@@ -31,8 +31,9 @@ class FC_Layer(MyLayer):
 
         self.weight = np.random.normal(loc=0, scale=0.01, size=(input_size, output_size))
         self.bias = np.zeros((1, output_size))
+        # self.weight = np.zeros((input_size, output_size))
         # self.weight = np.random.rand(input_size, output_size) / input_size
-        # self.bias = np.random.rand(1, output_size) / input_size
+        # self.bias = np.ones((1, output_size))
 
     def forward(self, input):
         self.input = input

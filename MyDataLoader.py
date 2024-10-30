@@ -144,10 +144,27 @@ class CrossEntropyData(MyDataLoader):
         Y = X @ W - b
 
         Y = Y / np.sum(Y, axis=1).reshape(data_size, 1)
+        print(Y[0])
+        Y = np.where(Y > 0.5, 1, 0)
+        print(Y[0])
 
         assert np.sum(Y) == data_size
 
         self.inputs = X
         self.labels = Y
 
+
+
+class FunctionData(MyDataLoader):
+    def __init__(self, input_size, output_size, batch_num, batch_size, function):
+        super(FunctionData, self).__init__(input_size, output_size, batch_num, batch_size)
+        assert input_size == output_size == 1
+
+        np_func = np.vectorize(function)
+        data_size = batch_num * batch_size
+        X = np.random.rand(data_size, input_size)
+        Y = np_func(X)
+
+        self.inputs = X
+        self.labels = Y
 
