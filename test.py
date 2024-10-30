@@ -124,14 +124,14 @@ def test_function(function, inner_sizes=None):
 
     model = SimpelModel(input_size, inner_sizes, output_size)
     params = model.get_params()
-    optimizer = Adam(params)
     # optimizer = SimpleSGD(params)
+    optimizer = Adam(params)
     criterion = SquareLoss()
 
     data_loader = FunctionData(input_size, output_size, batch_num, batch_size, function)
     X, Y = data_loader.get_data_set()
 
-    epochs = 50
+    epochs = 80
     for epoch_i in range(epochs):
         for batch_i, (input_data, label) in enumerate(data_loader):
             pre_label = model.forward(input_data)
@@ -164,12 +164,23 @@ def opi_func(x):
 
     return (res1 + (res2 + res3 + res4) / 40) / 2
 
+def heart_func(x):
+    a = 5
+
+    x = x * 2 * np.sqrt(3) - np.sqrt(3)
+    y = np.sin(a * np.pi * x)
+    y *= 0.9 * (np.sqrt(3.3 - x * x))
+    y += np.power(x ** 2, 1/3)
+
+    return (y + 2) / 5
+
 def test_some_functions():
     func_lst = [
         # lambda x:x,
         # lambda x: (x * 2 - 1) ** 2,
         # lambda x: np.sin(x * 2 * np.pi) / 2 + 1 / 2,
-        opi_func,
+        # opi_func,
+        heart_func,
     ]
 
     for func in func_lst:
