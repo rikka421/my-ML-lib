@@ -2,7 +2,7 @@ import numpy as np
 
 
 class MyNeuralNetwork:
-    def __init__(self, input_size, hidden_sizes, output_size):
+    def __init__(self):
         self.layers = None
         self.update_layer_list = None
 

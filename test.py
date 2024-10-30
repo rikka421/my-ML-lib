@@ -11,7 +11,7 @@ from MyNeuralNetworks import *
 
 class SimpelModel(MyNeuralNetwork):
     def __init__(self, input_size, hidden_sizes, output_size):
-        super(SimpelModel, self).__init__(input_size, hidden_sizes, output_size)
+        super(SimpelModel, self).__init__()
 
         self.layers = []
         self.update_layer_list = []
